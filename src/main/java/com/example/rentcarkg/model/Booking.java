@@ -1,5 +1,6 @@
 package com.example.rentcarkg.model;
 
+import com.example.rentcarkg.enums.BookingStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -33,4 +34,7 @@ public class Booking {
 
     @Column(nullable = false)
     private double totalPrice;
+
+    @Enumerated(EnumType.STRING)
+    private BookingStatus status;
 }
