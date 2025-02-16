@@ -8,11 +8,11 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public interface CarService {
-    CarResponse addCar(CarRequest carRequest);
+    CarResponse addCar(CarRequest carRequest, String ownerEmail);
 
-    CarResponse update(Long id, CarRequest carRequest);
+    CarResponse update(Long id, CarRequest carRequest, String ownerEmail);
 
-    void deleteCar(Long id);
+    void deleteCar(Long id, String ownerEmail);
 
     List<CarResponse> getAllCars();
 

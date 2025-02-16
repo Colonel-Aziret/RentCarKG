@@ -5,8 +5,9 @@ import com.example.rentcarkg.dto.CarResponse;
 import com.example.rentcarkg.service.CarService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -19,20 +20,22 @@ public class CarController {
     private final CarService carService;
 
     @PostMapping
-    public ResponseEntity<CarResponse> addCar(@Valid @RequestBody CarRequest carRequest) {
-        CarResponse savedCar = carService.addCar(carRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedCar);
+    public ResponseEntity<CarResponse> addCar(@Valid @RequestBody CarRequest carRequest,
+                                              @AuthenticationPrincipal UserDetails user) {
+        return ResponseEntity.ok(carService.addCar(carRequest, user.getUsername()));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CarResponse> updateCar(@PathVariable Long id, @Valid @RequestBody CarRequest carRequest) {
-        CarResponse updatedCar = carService.update(id, carRequest);
-        return ResponseEntity.ok(updatedCar);
+    public ResponseEntity<CarResponse> updateCar(@PathVariable Long id,
+                                                 @Valid @RequestBody CarRequest carRequest,
+                                                 @AuthenticationPrincipal UserDetails user) {
+        return ResponseEntity.ok(carService.update(id, carRequest, user.getUsername()));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCar(@PathVariable Long id) {
-        carService.deleteCar(id);
+    public ResponseEntity<Void> deleteCar(@PathVariable Long id,
+                                          @AuthenticationPrincipal UserDetails user) {
+        carService.deleteCar(id, user.getUsername());
         return ResponseEntity.noContent().build();
     }
 
