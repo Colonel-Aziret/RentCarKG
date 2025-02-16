@@ -31,7 +31,7 @@ public class Car {
     @JoinColumn(name = "owner_id")
     private User owner;
 
-    // 💡 Добавляем конструктор для создания Car из CarRequest
+    // 💡 Конструктор для создания Car из CarRequest
     public Car(CarRequest request) {
         this.brand = request.brand();
         this.model = request.model();
