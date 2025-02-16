@@ -1,5 +1,6 @@
 package com.example.rentcarkg.service;
 
+import com.example.rentcarkg.dto.AuthResponse;
 import com.example.rentcarkg.dto.LoginRequest;
 import com.example.rentcarkg.dto.RegisterRequest;
 import com.example.rentcarkg.model.User;
@@ -17,28 +18,39 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
 
-    public String register(RegisterRequest request) {
-        if (userRepository.existsByEmail(request.getEmail())) {
+    @Override
+    public AuthResponse register(RegisterRequest request) {
+        if (userRepository.existsByEmail(request.email())) {
             throw new IllegalArgumentException("Email is already in use");
         }
 
-        User user = new User();
-        user.setEmail(request.getEmail());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setRole(request.getRole()); // Роль из запроса (по умолчанию CLIENT)
+        User user = new User(
+                request.email(),
+                passwordEncoder.encode(request.password()),
+                request.role()
+        );
 
         userRepository.save(user);
-        return jwtProvider.generateToken(user.getEmail());
+
+        return generateAuthResponse(user.getEmail());
     }
 
-    public String login(LoginRequest request) {
-        User user = userRepository.findByEmail(request.getEmail())
+    @Override
+    public AuthResponse login(LoginRequest request) {
+        User user = userRepository.findByEmail(request.email())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+        if (!passwordEncoder.matches(request.password(), user.getPassword())) {
             throw new BadCredentialsException("Invalid password");
         }
 
-        return jwtProvider.generateToken(user.getEmail());
+        return generateAuthResponse(user.getEmail());
+    }
+
+    private AuthResponse generateAuthResponse(String email) {
+        String token = jwtProvider.generateToken(email);
+        long expiresIn = jwtProvider.getExpirationTime(); // Метод, который возвращает время жизни токена
+
+        return new AuthResponse(token, expiresIn);
     }
 }

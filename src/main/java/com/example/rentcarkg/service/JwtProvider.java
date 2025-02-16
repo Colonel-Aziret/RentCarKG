@@ -34,4 +34,8 @@ public class JwtProvider {
                 .getBody()
                 .getSubject();
     }
+
+    public long getExpirationTime() {
+        return EXPIRATION_TIME;
+    }
 }

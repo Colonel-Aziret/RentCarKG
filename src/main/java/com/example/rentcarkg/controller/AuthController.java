@@ -1,5 +1,6 @@
 package com.example.rentcarkg.controller;
 
+import com.example.rentcarkg.dto.AuthResponse;
 import com.example.rentcarkg.dto.LoginRequest;
 import com.example.rentcarkg.dto.RegisterRequest;
 import com.example.rentcarkg.service.AuthService;
@@ -15,14 +16,13 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody @Valid RegisterRequest request) {
-        String token = authService.register(request);
-        return ResponseEntity.ok(token);
+    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
+        return ResponseEntity.ok(authService.register(request));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody @Valid LoginRequest request) {
-        String token = authService.login(request);
-        return ResponseEntity.ok(token);
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
+        return ResponseEntity.ok(authService.login(request));
     }
 }
+

@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -30,17 +31,18 @@ public class JwtFilter extends OncePerRequestFilter {
 
         if (token != null && jwtProvider.getEmailFromToken(token) != null) {
             String email = jwtProvider.getEmailFromToken(token);
-            User user = userRepository.findByEmail(email)
+            UserDetails userDetails = userRepository.findByEmail(email)
                     .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                    user.getEmail(), null, List.of(new SimpleGrantedAuthority(user.getRole().name())));
+                    userDetails, null, userDetails.getAuthorities());
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 
         filterChain.doFilter(request, response);
     }
+
 
     private String resolveToken(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
