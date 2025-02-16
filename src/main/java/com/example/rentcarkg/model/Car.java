@@ -1,9 +1,12 @@
 package com.example.rentcarkg.model;
 
+import com.example.rentcarkg.dto.CarRequest;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "cars")
@@ -22,9 +25,22 @@ public class Car {
     private String model;
 
     @Column(nullable = false)
-    private double pricePerDay;
+    private BigDecimal pricePerDay;
 
     @ManyToOne
     @JoinColumn(name = "owner_id")
     private User owner;
+
+    // 💡 Добавляем конструктор для создания Car из CarRequest
+    public Car(CarRequest request) {
+        this.brand = request.brand();
+        this.model = request.model();
+        this.pricePerDay = request.pricePerDay();
+    }
+
+    public void updateFromRequest(CarRequest request) {
+        this.brand = request.brand();
+        this.model = request.model();
+        this.pricePerDay = request.pricePerDay();
+    }
 }

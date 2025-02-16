@@ -1,17 +1,26 @@
 package com.example.rentcarkg.service;
 
+import com.example.rentcarkg.dto.CarRequest;
+import com.example.rentcarkg.dto.CarResponse;
 import com.example.rentcarkg.model.Car;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface CarService {
-    Car addCar(Car car);
+    CarResponse addCar(CarRequest carRequest);
 
-    Car update(Long id, Car car);
+    CarResponse update(Long id, CarRequest carRequest);
 
     void deleteCar(Long id);
 
-    List<Car> getAllCars();
+    List<CarResponse> getAllCars();
 
-    Car getCarById(Long id);
+    CarResponse getCarById(Long id);
+
+    List<CarResponse> getCarsByBrand(String brand);
+
+    List<CarResponse> getCarsByModel(String model);
+
+    List<CarResponse> getCarsByMaxPrice(BigDecimal maxPrice);
 }

@@ -13,14 +13,15 @@ public interface CarRepository extends JpaRepository<Car, Long> {
     // Найти авто по ID
     Optional<Car> findById(Long id);
 
-    // Найти все машины определенного бренда
-    List<Car> findByBrand(String brand);
-
     // Найти все машины дешевле указанной цены
     List<Car> findByPricePerDayLessThanEqual(BigDecimal maxPrice);
 
     // Найти машины по модели
     List<Car> findByModelContainingIgnoreCase(String model);
 
+    // Найти все машины определенного бренда
+    List<Car> findByBrandIgnoreCase(String brand);
+
+    boolean existsById(Long id);
 }
 
