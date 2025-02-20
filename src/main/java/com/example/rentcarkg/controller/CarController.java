@@ -6,8 +6,7 @@ import com.example.rentcarkg.service.CarService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -19,23 +18,26 @@ import java.util.List;
 public class CarController {
     private final CarService carService;
 
-    @PostMapping
+    @PostMapping("/add-car")
+    @PreAuthorize("hasRole('OWNER')")
     public ResponseEntity<CarResponse> addCar(@Valid @RequestBody CarRequest carRequest,
-                                              @AuthenticationPrincipal UserDetails user) {
-        return ResponseEntity.ok(carService.addCar(carRequest, user.getUsername()));
+                                              @RequestParam String ownerEmail) {
+        return ResponseEntity.ok(carService.addCar(carRequest, ownerEmail));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/update-car/{id}")
+    @PreAuthorize("hasRole('OWNER')")
     public ResponseEntity<CarResponse> updateCar(@PathVariable Long id,
                                                  @Valid @RequestBody CarRequest carRequest,
-                                                 @AuthenticationPrincipal UserDetails user) {
-        return ResponseEntity.ok(carService.update(id, carRequest, user.getUsername()));
+                                                 @RequestParam String ownerEmail) {
+        return ResponseEntity.ok(carService.update(id, carRequest, ownerEmail));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete-car/{id}")
+    @PreAuthorize("hasRole('OWNER')")
     public ResponseEntity<Void> deleteCar(@PathVariable Long id,
-                                          @AuthenticationPrincipal UserDetails user) {
-        carService.deleteCar(id, user.getUsername());
+                                          @RequestParam String ownerEmail) {
+        carService.deleteCar(id, ownerEmail);
         return ResponseEntity.noContent().build();
     }
 

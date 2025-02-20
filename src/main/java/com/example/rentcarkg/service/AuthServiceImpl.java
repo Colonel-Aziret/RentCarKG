@@ -6,6 +6,7 @@ import com.example.rentcarkg.dto.RegisterRequest;
 import com.example.rentcarkg.model.User;
 import com.example.rentcarkg.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -32,7 +34,7 @@ public class AuthServiceImpl implements AuthService {
 
         userRepository.save(user);
 
-        return generateAuthResponse(user.getEmail());
+        return generateAuthResponse(user);
     }
 
     @Override
@@ -41,16 +43,19 @@ public class AuthServiceImpl implements AuthService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         if (!passwordEncoder.matches(request.password(), user.getPassword())) {
+            log.warn("Failed login attempt for email: {}", request.email());
             throw new BadCredentialsException("Invalid password");
         }
 
-        return generateAuthResponse(user.getEmail());
+        log.info("User '{}' logged in with role: {}", user.getEmail(), user.getRole());
+        return generateAuthResponse(user);
     }
 
-    private AuthResponse generateAuthResponse(String email) {
-        String token = jwtProvider.generateToken(email);
-        long expiresIn = jwtProvider.getExpirationTime(); // Метод, который возвращает время жизни токена
+    private AuthResponse generateAuthResponse(User user) {
+        String token = jwtProvider.generateToken(user);
+        long expiresIn = jwtProvider.getExpirationTime();
 
         return new AuthResponse(token, expiresIn);
     }
+
 }

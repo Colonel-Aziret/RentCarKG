@@ -11,7 +11,6 @@ import com.example.rentcarkg.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -25,8 +24,7 @@ public class BookingServiceImpl implements BookingService {
     private final CarRepository carRepository;
     private final UserRepository userRepository;
 
-    @PreAuthorize("hasRole('CLIENT')")
-    public BookingResponse bookCar(Long carId, String userEmail, LocalDate start, LocalDate end) {
+    public BookingResponse bookCar(Long carId, LocalDate start, LocalDate end, String userEmail) {
         Car car = carRepository.findById(carId)
                 .orElseThrow(() -> new EntityNotFoundException("Car not found"));
         User user = userRepository.findByEmail(userEmail)
