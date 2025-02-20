@@ -10,7 +10,6 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -25,7 +24,6 @@ public class CarServiceImpl implements CarService {
     private final UserRepository userRepository;
 
     @Override
-    @PreAuthorize("hasRole('OWNER')")
     public CarResponse addCar(CarRequest carRequest, String ownerEmail) {
         User owner = userRepository.findByEmail(ownerEmail)
                 .orElseThrow(() -> new EntityNotFoundException("Owner not found"));
@@ -38,7 +36,6 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
-    @PreAuthorize("hasRole('OWNER')")
     public CarResponse update(Long id, CarRequest carRequest, String ownerEmail) {
         Car existingCar = carRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Car not found with id: " + id));
@@ -54,7 +51,6 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
-    @PreAuthorize("hasRole('OWNER')")
     public void deleteCar(Long id, String ownerEmail) {
         Car car = carRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Car not found"));
