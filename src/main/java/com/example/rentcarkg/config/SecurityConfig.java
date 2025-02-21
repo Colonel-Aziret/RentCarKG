@@ -5,6 +5,7 @@ import com.example.rentcarkg.service.JwtFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -33,10 +34,21 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationProvider authenticationProvider) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/cars/**").hasRole("OWNER")
+                        // 🔓 Открытый доступ ко всем GET-запросам на /api/cars/**
+                        .requestMatchers(HttpMethod.GET, "/api/cars/**").permitAll()
+
+                        // 🔐 Владельцы могут добавлять, обновлять и удалять свои машины
+                        .requestMatchers(HttpMethod.POST, "/api/cars/add-car").hasRole("OWNER")
+                        .requestMatchers(HttpMethod.PUT, "/api/cars/update-car/**").hasRole("OWNER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/cars/delete-car/**").hasRole("OWNER")
+
+                        // 🔐 Админ доступ к /api/admin/**
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
+
+                        // 🔐 Клиенты могут делать бронирования
                         .requestMatchers("/api/bookings/**").hasRole("CLIENT")
+
+                        // Все остальные запросы требуют авторизации
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

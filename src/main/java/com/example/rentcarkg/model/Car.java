@@ -25,6 +25,18 @@ public class Car {
     private String model;
 
     @Column(nullable = false)
+    private int year;
+
+    @Column(nullable = false)
+    private String color;
+
+    @Column(nullable = false)
+    private String description;
+
+    @Column(nullable = false)
+    private String imageUrl;
+
+    @Column(nullable = false)
     private BigDecimal pricePerDay;
 
     @ManyToOne
