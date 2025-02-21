@@ -2,8 +2,10 @@ package com.example.rentcarkg.service;
 
 import com.example.rentcarkg.dto.CarRequest;
 import com.example.rentcarkg.dto.CarResponse;
+import com.example.rentcarkg.enums.BookingStatus;
 import com.example.rentcarkg.model.Car;
 import com.example.rentcarkg.model.User;
+import com.example.rentcarkg.repository.BookingRepository;
 import com.example.rentcarkg.repository.CarRepository;
 import com.example.rentcarkg.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -22,6 +24,7 @@ import java.util.stream.Collectors;
 public class CarServiceImpl implements CarService {
     private final CarRepository carRepository;
     private final UserRepository userRepository;
+    private final BookingRepository bookingRepository;
 
     @Override
     public CarResponse addCar(CarRequest carRequest, String ownerEmail) {
@@ -99,6 +102,20 @@ public class CarServiceImpl implements CarService {
                 .stream()
                 .map(CarResponse::new)
                 .collect(Collectors.toList());
+    }
+
+    public List<CarResponse> getFilteredCars(BigDecimal minPrice, BigDecimal maxPrice, boolean available) {
+        List<Car> cars = carRepository.findAll().stream()
+                .filter(car -> (minPrice == null || car.getPricePerDay().compareTo(minPrice) >= 0))
+                .filter(car -> (maxPrice == null || car.getPricePerDay().compareTo(maxPrice) <= 0))
+                .filter(car -> !available || isCarAvailable(car.getId()))
+                .toList();
+
+        return cars.stream().map(CarResponse::new).toList();
+    }
+
+    private boolean isCarAvailable(Long carId) {
+        return bookingRepository.findByCarIdAndStatus(carId, BookingStatus.CONFIRMED).isEmpty();
     }
 }
 

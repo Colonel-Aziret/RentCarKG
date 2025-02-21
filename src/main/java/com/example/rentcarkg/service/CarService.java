@@ -23,4 +23,6 @@ public interface CarService {
     List<CarResponse> getCarsByModel(String model);
 
     List<CarResponse> getCarsByMaxPrice(BigDecimal maxPrice);
+
+    List<CarResponse> getFilteredCars(BigDecimal minPrice, BigDecimal maxPrice, boolean available);
 }
