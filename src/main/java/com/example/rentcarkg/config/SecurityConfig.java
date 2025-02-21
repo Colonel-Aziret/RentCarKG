@@ -34,6 +34,9 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationProvider authenticationProvider) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
+                        // 🔓 Открываем доступ к Swagger
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+
                         // 🔓 Открытый доступ ко всем GET-запросам на /api/cars/**
                         .requestMatchers(HttpMethod.GET, "/api/cars/**").permitAll()
 
