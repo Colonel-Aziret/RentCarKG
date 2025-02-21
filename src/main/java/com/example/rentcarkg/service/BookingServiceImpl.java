@@ -11,9 +11,13 @@ import com.example.rentcarkg.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
@@ -39,14 +43,57 @@ public class BookingServiceImpl implements BookingService {
         booking.setUser(user);
         booking.setStartDate(start);
         booking.setEndDate(end);
+        BigDecimal totalCost = calculateRentalCost(carId, start, end);
+        booking.setTotalPrice(totalCost);
         booking.setStatus(BookingStatus.PENDING);
 
         return new BookingResponse(bookingRepository.save(booking));
+    }
+
+    public BookingResponse confirmBooking(Long bookingId, String ownerEmail) {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new EntityNotFoundException("Booking not found"));
+
+        if (!booking.getCar().getOwner().getEmail().equals(ownerEmail)) {
+            throw new AccessDeniedException("You are not the owner of this car");
+        }
+
+        booking.setStatus(BookingStatus.CONFIRMED);
+        bookingRepository.save(booking);
+        return new BookingResponse(booking);
+    }
+
+    public BigDecimal cancelBooking(Long bookingId, String userEmail) {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new EntityNotFoundException("Booking not found"));
+
+        if (!booking.getUser().getEmail().equals(userEmail)) {
+            throw new AccessDeniedException("You can only cancel your own booking");
+        }
+
+        long hoursUntilStart = ChronoUnit.HOURS.between(LocalDateTime.now(), booking.getStartDate().atStartOfDay());
+        BigDecimal penalty = BigDecimal.ZERO;
+
+        if (hoursUntilStart < 24) {
+            penalty = booking.getTotalPrice().multiply(BigDecimal.valueOf(0.5)); // 50% штраф
+        }
+
+        booking.setStatus(BookingStatus.CANCELLED);
+        bookingRepository.save(booking);
+
+        return penalty;
     }
 
     public boolean isCarAvailable(Long carId, LocalDate start, LocalDate end) {
         List<Booking> activeBookings = bookingRepository.findByCarIdAndStatus(carId, BookingStatus.CONFIRMED);
         return activeBookings.stream().noneMatch(b ->
                 (start.isBefore(b.getEndDate()) && end.isAfter(b.getStartDate())));
+    }
+
+    public BigDecimal calculateRentalCost(Long carId, LocalDate start, LocalDate end) {
+        Car car = carRepository.findById(carId)
+                .orElseThrow(() -> new EntityNotFoundException("Car not found"));
+        long days = ChronoUnit.DAYS.between(start, end);
+        return car.getPricePerDay().multiply(BigDecimal.valueOf(days));
     }
 }
