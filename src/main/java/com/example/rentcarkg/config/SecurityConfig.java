@@ -37,6 +37,9 @@ public class SecurityConfig {
                         // 🔓 Открываем доступ к Swagger
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
 
+                        // 🔓 Открытый доступ к email-сервису (без авторизации)
+                        .requestMatchers(HttpMethod.POST, "/api/email/send").permitAll()
+
                         // 🔓 Открытый доступ ко всем GET-запросам на /api/cars/**
                         .requestMatchers(HttpMethod.GET, "/api/cars/**").permitAll()
 
