@@ -13,6 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @Tag(name = "Автомобили", description = "API для работы с автомобилями")
@@ -102,4 +103,13 @@ public class CarController {
 
         return ResponseEntity.ok(carService.getCarsByMaxPrice(maxPrice));
     }
+
+    @GetMapping("/available")
+    public ResponseEntity<List<CarResponse>> getAvailableCars(
+            @RequestParam LocalDate start,
+            @RequestParam LocalDate end
+    ) {
+        return ResponseEntity.ok(carService.getAvailableCars(start, end));
+    }
+
 }

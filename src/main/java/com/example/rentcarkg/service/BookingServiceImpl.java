@@ -86,13 +86,17 @@ public class BookingServiceImpl implements BookingService {
         }
 
         long hoursUntilStart = ChronoUnit.HOURS.between(LocalDateTime.now(), booking.getStartDate().atStartOfDay());
+        if (hoursUntilStart < 2) {
+            throw new IllegalStateException("You cannot cancel the booking less than 2 hours before start time.");
+        }
+
         BigDecimal penalty = BigDecimal.ZERO;
 
         if (hoursUntilStart < 24) {
-            penalty = booking.getTotalPrice().multiply(BigDecimal.valueOf(0.5)); // 50% штраф
+            penalty = booking.getTotalPrice().multiply(BigDecimal.valueOf(0.5)); // 50% penalty
         }
 
-        booking.setPenalty(penalty); // 💡 сохраняем штраф в БД
+        booking.setPenalty(penalty);
         booking.setStatus(BookingStatus.CANCELLED);
         bookingRepository.save(booking);
 
@@ -107,6 +111,51 @@ public class BookingServiceImpl implements BookingService {
         );
 
         return penalty;
+    }
+
+    public List<BookingResponse> getBookingsByUser(String userEmail) {
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+        List<Booking> bookings = bookingRepository.findByUser(user);
+        return bookings.stream().map(BookingResponse::new).toList();
+    }
+
+    public BookingResponse rejectBooking(Long bookingId, String ownerEmail) {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new EntityNotFoundException("Booking not found"));
+
+        if (!booking.getCar().getOwner().getEmail().equals(ownerEmail)) {
+            throw new AccessDeniedException("You are not the owner of this car");
+        }
+
+        if (booking.getStatus() == BookingStatus.CANCELLED || booking.getStatus() == BookingStatus.REJECTED) {
+            throw new IllegalStateException("Booking is already cancelled or rejected");
+        }
+
+        booking.setStatus(BookingStatus.REJECTED);
+        bookingRepository.save(booking);
+
+        // Email уведомление
+        emailService.sendEmail(
+                booking.getUser().getEmail(),
+                "Booking Rejected",
+                "Your booking for car '" + booking.getCar().getBrand() + " " + booking.getCar().getModel() +
+                        "' has been rejected by the owner."
+        );
+
+        return new BookingResponse(booking);
+    }
+
+    public List<BookingResponse> getCancelledBookingsWithPenalty(String userEmail) {
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+        List<Booking> cancelledBookings = bookingRepository.findByUserAndStatus(user, BookingStatus.CANCELLED);
+        return cancelledBookings.stream()
+                .filter(booking -> booking.getPenalty() != null && booking.getPenalty().compareTo(BigDecimal.ZERO) > 0)
+                .map(BookingResponse::new)
+                .toList();
     }
 
     public boolean isCarAvailable(Long carId, LocalDate start, LocalDate end) {

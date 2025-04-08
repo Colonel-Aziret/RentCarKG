@@ -2,9 +2,9 @@ package com.example.rentcarkg.service;
 
 import com.example.rentcarkg.dto.CarRequest;
 import com.example.rentcarkg.dto.CarResponse;
-import com.example.rentcarkg.model.Car;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 public interface CarService {
@@ -25,4 +25,5 @@ public interface CarService {
     List<CarResponse> getCarsByMaxPrice(BigDecimal maxPrice);
 
     List<CarResponse> getFilteredCars(BigDecimal minPrice, BigDecimal maxPrice, boolean available);
+    List<CarResponse> getAvailableCars(LocalDate start, LocalDate end);
 }

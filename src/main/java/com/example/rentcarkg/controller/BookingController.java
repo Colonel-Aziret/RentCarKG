@@ -8,10 +8,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 @Tag(name = "Бронирование", description = "API для бронирования автомобилей")
 @RestController
@@ -61,4 +63,22 @@ public class BookingController {
         BigDecimal penalty = bookingService.cancelBooking(id, userEmail);
         return ResponseEntity.ok("Booking cancelled. Penalty: " + penalty + " KGS");
     }
+
+    @PostMapping("/reject/{bookingId}")
+    @PreAuthorize("hasRole('OWNER')")
+    public ResponseEntity<BookingResponse> rejectBooking(
+            @PathVariable Long bookingId,
+            Authentication authentication
+    ) {
+        String ownerEmail = authentication.getName();
+        return ResponseEntity.ok(bookingService.rejectBooking(bookingId, ownerEmail));
+    }
+
+    @GetMapping("/my-bookings")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<List<BookingResponse>> getMyBookings(Authentication authentication) {
+        String userEmail = authentication.getName();
+        return ResponseEntity.ok(bookingService.getBookingsByUser(userEmail));
+    }
+
 }

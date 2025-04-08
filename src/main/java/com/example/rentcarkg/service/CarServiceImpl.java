@@ -15,6 +15,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional
 public class CarServiceImpl implements CarService {
+    private final BookingService bookingService;
     private final CarRepository carRepository;
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
@@ -112,6 +114,14 @@ public class CarServiceImpl implements CarService {
                 .toList();
 
         return cars.stream().map(CarResponse::new).toList();
+    }
+
+    public List<CarResponse> getAvailableCars(LocalDate start, LocalDate end) {
+        List<Car> allCars = carRepository.findAll();
+        return allCars.stream()
+                .filter(car -> bookingService.isCarAvailable(car.getId(), start, end))
+                .map(CarResponse::new)
+                .toList();
     }
 
     private boolean isCarAvailable(Long carId) {
