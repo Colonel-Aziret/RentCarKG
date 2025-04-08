@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "bookings")
@@ -36,6 +37,15 @@ public class Booking {
     @Column(nullable = false)
     private BigDecimal totalPrice;
 
+    private BigDecimal penalty;
+
     @Enumerated(EnumType.STRING)
     private BookingStatus status;
+
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
 }

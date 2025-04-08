@@ -24,6 +24,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional
 public class BookingServiceImpl implements BookingService {
+    private final EmailService emailService;
     private final BookingRepository bookingRepository;
     private final CarRepository carRepository;
     private final UserRepository userRepository;
@@ -54,12 +55,25 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new EntityNotFoundException("Booking not found"));
 
+        if (booking.getStatus() == BookingStatus.CONFIRMED) {
+            throw new IllegalStateException("Booking is already confirmed");
+        }
+
         if (!booking.getCar().getOwner().getEmail().equals(ownerEmail)) {
             throw new AccessDeniedException("You are not the owner of this car");
         }
 
         booking.setStatus(BookingStatus.CONFIRMED);
         bookingRepository.save(booking);
+
+        // ✅ Уведомление клиенту
+        emailService.sendEmail(
+                booking.getUser().getEmail(),
+                "Booking Confirmed",
+                "Your booking for car '" + booking.getCar().getTitle() + "' from " +
+                        booking.getStartDate() + " to " + booking.getEndDate() + " has been confirmed."
+        );
+
         return new BookingResponse(booking);
     }
 
@@ -78,8 +92,19 @@ public class BookingServiceImpl implements BookingService {
             penalty = booking.getTotalPrice().multiply(BigDecimal.valueOf(0.5)); // 50% штраф
         }
 
+        booking.setPenalty(penalty); // 💡 сохраняем штраф в БД
         booking.setStatus(BookingStatus.CANCELLED);
         bookingRepository.save(booking);
+
+        // ✅ Уведомление клиенту
+        emailService.sendEmail(
+                booking.getUser().getEmail(),
+                "Booking Cancelled",
+                "Your booking for car '" + booking.getCar().getTitle() + "' has been cancelled. " +
+                        (penalty.compareTo(BigDecimal.ZERO) > 0 ?
+                                "A penalty of " + penalty + " has been applied." :
+                                "No penalty was applied.")
+        );
 
         return penalty;
     }

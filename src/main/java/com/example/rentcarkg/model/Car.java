@@ -55,4 +55,8 @@ public class Car {
         this.model = request.model();
         this.pricePerDay = request.pricePerDay();
     }
+
+    public String getTitle() {
+        return brand + " " + model;
+    }
 }
