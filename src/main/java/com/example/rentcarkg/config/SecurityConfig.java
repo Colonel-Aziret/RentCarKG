@@ -34,6 +34,9 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationProvider authenticationProvider) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
+                        // Открываем доступ к статическим файлам
+                        .requestMatchers("/static/images/**").permitAll()
+
                         // 🔓 Открываем доступ к регистрации и авторизации
                         .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
 

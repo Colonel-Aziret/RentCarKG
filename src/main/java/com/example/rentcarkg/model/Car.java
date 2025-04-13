@@ -47,6 +47,9 @@ public class Car {
     public Car(CarRequest request) {
         this.brand = request.brand();
         this.model = request.model();
+        this.year = request.year();
+        this.color = request.color();
+        this.description = request.description();
         this.pricePerDay = request.pricePerDay();
     }
 

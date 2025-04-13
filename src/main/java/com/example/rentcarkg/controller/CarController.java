@@ -8,9 +8,11 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -23,14 +25,16 @@ import java.util.List;
 public class CarController {
     private final CarService carService;
 
-    @Operation(summary = "Добавить новый автомобиль", description = "Доступно только владельцам (OWNER)")
-    @PostMapping("/add-car")
+    @Operation(summary = "Добавить новый автомобиль (с изображением)", description = "Доступно только владельцам (OWNER)")
+    @PostMapping(value = "/add-car", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('OWNER')")
     public ResponseEntity<CarResponse> addCar(
-            @Valid @RequestBody CarRequest carRequest,
+            @RequestPart("car") @Valid CarRequest carRequest,
+            @RequestPart("image") MultipartFile image,
             @RequestParam @Parameter(description = "Email владельца") String ownerEmail) {
 
-        return ResponseEntity.ok(carService.addCar(carRequest, ownerEmail));
+        CarResponse response = carService.addCar(carRequest, image, ownerEmail);
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "Обновить данные автомобиля", description = "Доступно только владельцам (OWNER)")

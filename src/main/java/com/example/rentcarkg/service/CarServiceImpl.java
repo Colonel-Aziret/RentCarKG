@@ -13,6 +13,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -24,19 +25,23 @@ import java.util.stream.Collectors;
 @Transactional
 public class CarServiceImpl implements CarService {
     private final BookingService bookingService;
+    private final FileStorageService fileStorageService;
     private final CarRepository carRepository;
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
 
     @Override
-    public CarResponse addCar(CarRequest carRequest, String ownerEmail) {
+    public CarResponse addCar(CarRequest carRequest, MultipartFile image, String ownerEmail) {
         User owner = userRepository.findByEmail(ownerEmail)
                 .orElseThrow(() -> new EntityNotFoundException("Owner not found"));
 
-        Car car = new Car(carRequest);
-        car.setOwner(owner);
-        Car savedCar = carRepository.save(car);
+        String imageUrl = fileStorageService.saveFile(image);
 
+        Car car = new Car(carRequest);
+        car.setImageUrl(imageUrl);
+        car.setOwner(owner);
+
+        Car savedCar = carRepository.save(car);
         return new CarResponse(savedCar);
     }
 

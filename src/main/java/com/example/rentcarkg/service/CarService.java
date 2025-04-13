@@ -2,13 +2,14 @@ package com.example.rentcarkg.service;
 
 import com.example.rentcarkg.dto.CarRequest;
 import com.example.rentcarkg.dto.CarResponse;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
 public interface CarService {
-    CarResponse addCar(CarRequest carRequest, String ownerEmail);
+    CarResponse addCar(CarRequest carRequest, MultipartFile image, String ownerEmail);
 
     CarResponse update(Long id, CarRequest carRequest, String ownerEmail);
 
