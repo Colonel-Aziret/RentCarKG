@@ -7,6 +7,8 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.nio.file.Paths;
+
 @Configuration
 public class WebConfig {
     @Bean
@@ -15,7 +17,7 @@ public class WebConfig {
             @Override
             public void addCorsMappings(@NonNull CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:5173")
+                        .allowedOrigins("http://localhost:3000")
                         .allowedMethods("*")
                         .allowedHeaders("*")
                         .allowCredentials(true);
@@ -24,8 +26,10 @@ public class WebConfig {
             @Override
             public void addResourceHandlers(@NonNull ResourceHandlerRegistry registry) {
                 // Путь для отдачи изображений
-                registry.addResourceHandler("/static/images/**")
-                        .addResourceLocations("file:uploads/images/");
+                String uploadsDir = Paths.get("uploads").toAbsolutePath().toString();
+
+                registry.addResourceHandler("/uploads/images/**", "/static/images/**")
+                        .addResourceLocations("file:" + uploadsDir + "/images/");
             }
         };
     }
