@@ -48,6 +48,9 @@ public class Car {
     @Column(nullable = false)
     private BigDecimal pricePerDay;
 
+    @Column(nullable = false)
+    private boolean isAvailable = true;
+
     @ManyToOne
     @JoinColumn(name = "owner_id")
     private User owner;
@@ -70,5 +73,9 @@ public class Car {
 
     public String getTitle() {
         return brand + " " + model;
+    }
+
+    public boolean isOwnedBy(User user) {
+        return this.owner.equals(user);
     }
 }
