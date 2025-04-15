@@ -3,17 +3,26 @@ package com.example.rentcarkg.dto;
 import com.example.rentcarkg.enums.BookingStatus;
 import com.example.rentcarkg.model.Booking;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public record BookingResponse(
         Long id,
         Long carId,
         String carBrand,
         String carModel,
-        String renterEmail,
+        String carImageUrl,
+        String pickUpLocation,
+        String dropOffLocation,
         LocalDate startDate,
         LocalDate endDate,
-        BookingStatus status
+        BigDecimal totalPrice,
+        BookingStatus status,
+        String customerName,
+        String customerPhone,
+        String customerEmail,
+        LocalDateTime createdAt
 ) {
     public BookingResponse(Booking booking) {
         this(
@@ -21,10 +30,17 @@ public record BookingResponse(
                 booking.getCar().getId(),
                 booking.getCar().getBrand(),
                 booking.getCar().getModel(),
-                booking.getUser().getEmail(),
+                booking.getCar().getImageUrl(),
+                booking.getPickUpLocation(),
+                booking.getDropOffLocation(),
                 booking.getStartDate(),
                 booking.getEndDate(),
-                booking.getStatus()
+                booking.getTotalPrice(),
+                booking.getStatus(),
+                booking.getCustomerName(),
+                booking.getCustomerPhone(),
+                booking.getCustomerEmail(),
+                booking.getCreatedAt()
         );
     }
 }
