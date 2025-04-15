@@ -35,6 +35,21 @@ public class Booking {
     private LocalDate endDate;
 
     @Column(nullable = false)
+    private String pickUpLocation;
+
+    @Column(nullable = false)
+    private String dropOffLocation;
+
+    @Column(nullable = false)
+    private String customerName;
+
+    @Column(nullable = false)
+    private String customerEmail;
+
+    @Column(nullable = false)
+    private String customerPhone;
+
+    @Column(nullable = false)
     private BigDecimal totalPrice;
 
     private BigDecimal penalty;
