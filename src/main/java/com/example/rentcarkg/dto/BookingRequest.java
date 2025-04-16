@@ -6,13 +6,11 @@ import java.time.LocalDate;
 
 public record BookingRequest(
         @NotNull Long carId,
-        @NotBlank String pickUpLocation,
-        @NotBlank String dropOffLocation,
+        @NotNull Long pickUpLocationId,
+        @NotNull Long dropOffLocationId,
         @FutureOrPresent LocalDate startDate,
         @Future LocalDate endDate,
-        @NotBlank String customerName,
-        @NotBlank String customerPhone,
-        @NotBlank @Email String customerEmail
+        @NotNull BookingCustomerInfoDto userInfo
 ) {
     public void validate() {
         if (startDate.isAfter(endDate)) {
@@ -20,3 +18,5 @@ public record BookingRequest(
         }
     }
 }
+
+
