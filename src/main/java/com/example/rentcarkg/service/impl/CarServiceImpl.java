@@ -1,4 +1,4 @@
-package com.example.rentcarkg.service;
+package com.example.rentcarkg.service.impl;
 
 import com.example.rentcarkg.dto.CarRequest;
 import com.example.rentcarkg.dto.CarResponse;
@@ -8,6 +8,9 @@ import com.example.rentcarkg.model.User;
 import com.example.rentcarkg.repository.BookingRepository;
 import com.example.rentcarkg.repository.CarRepository;
 import com.example.rentcarkg.repository.UserRepository;
+import com.example.rentcarkg.service.BookingService;
+import com.example.rentcarkg.service.CarService;
+import com.example.rentcarkg.service.FileStorageService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
