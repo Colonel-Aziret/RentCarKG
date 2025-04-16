@@ -1,8 +1,9 @@
-package com.example.rentcarkg.service;
+package com.example.rentcarkg.service.impl;
 
 import com.example.rentcarkg.enums.Role;
 import com.example.rentcarkg.model.User;
 import com.example.rentcarkg.repository.UserRepository;
+import com.example.rentcarkg.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
