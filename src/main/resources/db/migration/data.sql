@@ -20,4 +20,15 @@ VALUES ('Toyota', 'Camry', 50.00, 2, 2020, 'Black', 'Spacious family sedan', 'ht
 INSERT INTO bookings (start_date, end_date, status, total_price, car_id, user_id, created_at, penalty)
 VALUES ('2025-05-01', '2025-05-07', 'PENDING', 350.00, 1, 1, '2025-04-01 10:00:00', 0.00),    -- A pending booking
        ('2025-05-10', '2025-05-12', 'CONFIRMED', 120.00, 2, 2, '2025-04-02 14:30:00', 10.00), -- A confirmed booking
-       ('2025-06-01', '2025-06-05', 'CANCELED', 0.00, 3, 1, '2025-04-03 09:15:00', 20.00); -- A canceled booking
+       ('2025-06-01', '2025-06-05', 'CANCELED', 0.00, 3, 1, '2025-04-03 09:15:00', 20.00);
+-- A canceled booking
+
+-- Insert initial data into the 'locations' table
+INSERT INTO locations (city, address)
+VALUES ('Бишкек', 'проспект Чуй 137'),
+       ('Ош', 'улица Ленина 25'),
+       ('Каракол', 'улица Абдрахманова 12'),
+       ('Чолпон-Ата', 'курортная зона Иссык-Куль'),
+       ('Талас', 'улица Манаса 10'),
+       ('Нарын', 'улица Сыдыкова 7'),
+       ('Токмок', 'улица Фрунзе 8');
