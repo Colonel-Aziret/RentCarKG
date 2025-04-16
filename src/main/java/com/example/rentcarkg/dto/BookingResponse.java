@@ -19,9 +19,6 @@ public record BookingResponse(
         LocalDate endDate,
         BigDecimal totalPrice,
         BookingStatus status,
-        String customerName,
-        String customerPhone,
-        String customerEmail,
         LocalDateTime createdAt
 ) {
     public BookingResponse(Booking booking) {
@@ -31,16 +28,14 @@ public record BookingResponse(
                 booking.getCar().getBrand(),
                 booking.getCar().getModel(),
                 booking.getCar().getImageUrl(),
-                booking.getPickUpLocation(),
-                booking.getDropOffLocation(),
+                booking.getPickUpLocation().getCity(),
+                booking.getDropOffLocation().getCity(),
                 booking.getStartDate(),
                 booking.getEndDate(),
                 booking.getTotalPrice(),
                 booking.getStatus(),
-                booking.getCustomerName(),
-                booking.getCustomerPhone(),
-                booking.getCustomerEmail(),
                 booking.getCreatedAt()
         );
     }
 }
+
