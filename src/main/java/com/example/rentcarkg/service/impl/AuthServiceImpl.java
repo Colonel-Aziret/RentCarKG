@@ -1,10 +1,12 @@
-package com.example.rentcarkg.service;
+package com.example.rentcarkg.service.impl;
 
 import com.example.rentcarkg.dto.AuthResponse;
 import com.example.rentcarkg.dto.LoginRequest;
 import com.example.rentcarkg.dto.RegisterRequest;
 import com.example.rentcarkg.model.User;
 import com.example.rentcarkg.repository.UserRepository;
+import com.example.rentcarkg.service.AuthService;
+import com.example.rentcarkg.service.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;
