@@ -34,20 +34,13 @@ public class Booking {
     @Column(nullable = false)
     private LocalDate endDate;
 
-    @Column(nullable = false)
-    private String pickUpLocation;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "pickup_location_id", nullable = false)
+    private Location pickUpLocation;
 
-    @Column(nullable = false)
-    private String dropOffLocation;
-
-    @Column(nullable = false)
-    private String customerName;
-
-    @Column(nullable = false)
-    private String customerEmail;
-
-    @Column(nullable = false)
-    private String customerPhone;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "dropoff_location_id", nullable = false)
+    private Location dropOffLocation;
 
     @Column(nullable = false)
     private BigDecimal totalPrice;
@@ -58,6 +51,9 @@ public class Booking {
     private BookingStatus status;
 
     private LocalDateTime createdAt;
+
+    @OneToOne(mappedBy = "booking", cascade = CascadeType.ALL)
+    private BookingCustomerDetails customerDetails;
 
     @PrePersist
     protected void onCreate() {
