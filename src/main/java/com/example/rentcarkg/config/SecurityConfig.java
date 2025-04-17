@@ -67,7 +67,11 @@ public class SecurityConfig {
                         // 🔐 Админ доступ к /api/admin/**
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
-                        // 🔐 Клиенты могут делать бронирования
+                        .requestMatchers(HttpMethod.GET, "/api/bookings/owner-requests").hasRole("OWNER")
+                        .requestMatchers(HttpMethod.PATCH, "/api/bookings/*/confirm").hasRole("OWNER")
+                        .requestMatchers(HttpMethod.PATCH, "/api/bookings/*/reject").hasRole("OWNER")
+                        .requestMatchers(HttpMethod.PATCH, "/api/bookings/*/cancel").hasRole("CLIENT")
+
                         .requestMatchers("/api/bookings/**").hasRole("CLIENT")
 
                         // Все остальные запросы требуют авторизации
