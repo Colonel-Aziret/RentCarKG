@@ -5,6 +5,7 @@ import com.example.rentcarkg.dto.BookingResponse;
 import com.example.rentcarkg.service.BookingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.security.PermitAll;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -39,14 +40,26 @@ public class BookingController {
         return ResponseEntity.ok(bookingService.getUserBookings(authentication.getName()));
     }
 
+    @Operation(summary = "Подтверждение бронирования по email-ссылке")
+    @PatchMapping("/{id}/email-confirm")
+    @PermitAll
+    public ResponseEntity<BookingResponse> confirmByEmail(@PathVariable Long id) {
+        return ResponseEntity.ok(bookingService.confirmByEmail(id));
+    }
+
+    @Operation(summary = "Заявки для владельца")
+    @GetMapping("/owner-requests")
+//    @PreAuthorize("hasRole('OWNER')")
+    public ResponseEntity<List<BookingResponse>> getRequestsForOwner(Authentication authentication) {
+        return ResponseEntity.ok(bookingService.getRequestsForOwner(authentication.getName()));
+    }
+
     @Operation(summary = "Подтвердить бронирование",
             description = "Доступно для владельцев автомобилей")
     @PatchMapping("/{id}/confirm")
-    @PreAuthorize("hasRole('OWNER')")
-    public ResponseEntity<BookingResponse> confirmBooking(
-            @PathVariable Long id,
-            Authentication authentication) {
-
+//    @PreAuthorize("hasRole('OWNER')")
+    public ResponseEntity<BookingResponse> confirmBooking(@PathVariable Long id,
+                                                          Authentication authentication) {
         return ResponseEntity.ok(bookingService.confirmBooking(id, authentication.getName()));
     }
 
