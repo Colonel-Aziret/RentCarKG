@@ -91,7 +91,24 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    public BookingResponse confirmByEmail(Long id) {
+        Booking booking = bookingRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Booking not found"));
+
+        if (booking.getStatus() != BookingStatus.PENDING) {
+            throw new IllegalStateException("Booking already confirmed or not available");
+        }
+
+        booking.setStatus(BookingStatus.EMAIL_CONFIRMED);
+        bookingRepository.save(booking);
+
+        return new BookingResponse(booking);
+    }
+
+    @Override
     public BookingResponse confirmBooking(Long bookingId, String ownerEmail) {
+        System.out.println("✅ confirmBooking() called by: " + ownerEmail + " for booking: " + bookingId);
+
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new EntityNotFoundException("Booking not found"));
 
@@ -101,8 +118,8 @@ public class BookingServiceImpl implements BookingService {
         }
 
         // Проверка статуса
-        if (booking.getStatus() != BookingStatus.PENDING) {
-            throw new IllegalStateException("Only pending bookings can be confirmed");
+        if (booking.getStatus() != BookingStatus.EMAIL_CONFIRMED) {
+            throw new IllegalStateException("Booking must be email-confirmed before approval");
         }
 
         // Проверка доступности авто
@@ -121,10 +138,35 @@ public class BookingServiceImpl implements BookingService {
                 booking.getCustomerDetails().getEmail(),
                 "Booking Confirmed",
                 "Your booking for " + booking.getCar().getBrand() + " " + booking.getCar().getModel() +
-                        " from " + booking.getStartDate() + " to " + booking.getEndDate() + " has been confirmed."
+                        " from " + booking.getStartDate() + " to " + booking.getEndDate() + " has been confirmed.",
+                true
         );
 
         return new BookingResponse(confirmedBooking);
+    }
+
+    @Override
+    public List<BookingResponse> getRequestsForOwner(String ownerEmail) {
+        System.out.println("📥 Looking for bookings for owner: " + ownerEmail);
+
+        return bookingRepository.findAll().stream()
+                .peek(b -> {
+                    String carInfo = b.getCar() != null ? b.getCar().getId().toString() : "null";
+                    String ownerInfo = (b.getCar() != null && b.getCar().getOwner() != null)
+                            ? b.getCar().getOwner().getEmail()
+                            : "null";
+
+                    System.out.println("→ Booking ID: " + b.getId()
+                            + ", carId=" + carInfo
+                            + ", status=" + b.getStatus()
+                            + ", carOwner=" + ownerInfo);
+                })
+                .filter(b -> b.getCar() != null &&
+                        b.getCar().getOwner() != null &&
+                        b.getCar().getOwner().getEmail().equals(ownerEmail))
+                .filter(b -> b.getStatus() == BookingStatus.EMAIL_CONFIRMED)
+                .map(BookingResponse::new)
+                .toList();
     }
 
     @Override
@@ -138,7 +180,7 @@ public class BookingServiceImpl implements BookingService {
         }
 
         // Проверка статуса
-        if (booking.getStatus() != BookingStatus.PENDING) {
+        if (booking.getStatus() != BookingStatus.EMAIL_CONFIRMED) {
             throw new IllegalStateException("Only pending bookings can be rejected");
         }
 
@@ -153,7 +195,8 @@ public class BookingServiceImpl implements BookingService {
                 booking.getCustomerDetails().getEmail(),
                 "Booking Rejected",
                 "Your booking for " + booking.getCar().getBrand() + " " + booking.getCar().getModel() +
-                        " has been rejected by the owner."
+                        " has been rejected by the owner.",
+                true
         );
 
         return new BookingResponse(rejectedBooking);
@@ -199,7 +242,8 @@ public class BookingServiceImpl implements BookingService {
                 booking.getCustomerDetails().getEmail(),
                 "Booking Cancelled",
                 "Your booking for " + booking.getCar().getBrand() + " " + booking.getCar().getModel() +
-                        " has been cancelled. " + penaltyMessage
+                        " has been cancelled. " + penaltyMessage,
+                true
         );
 
         return new BookingResponse(cancelledBooking);

@@ -11,10 +11,15 @@ public interface BookingService {
 
     List<BookingResponse> getUserBookings(String userEmail);
 
+    BookingResponse confirmByEmail(Long id);
+
     BookingResponse confirmBooking(Long bookingId, String ownerEmail);
 
     BookingResponse cancelBooking(Long bookingId, String userEmail);
 
+    List<BookingResponse> getRequestsForOwner(String ownerEmail);
+
     BookingResponse rejectBooking(Long bookingId, String ownerEmail);
+
     boolean isCarAvailable(Long carId, LocalDate start, LocalDate end);
 }
