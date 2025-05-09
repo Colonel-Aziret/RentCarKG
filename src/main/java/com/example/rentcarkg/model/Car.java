@@ -25,16 +25,43 @@ public class Car {
     private String model;
 
     @Column(nullable = false)
+    private int year;
+
+    @Column(nullable = false)
+    private String color;
+
+    @Column(nullable = false)
+    private int capacity;
+
+    @Column(nullable = false)
+    private String fuelType;
+
+    @Column(nullable = false)
+    private String transmission;
+
+    @Column(nullable = false)
+    private String description;
+
+    @Column(nullable = false)
+    private String imageUrl;
+
+    @Column(nullable = false)
     private BigDecimal pricePerDay;
+
+    @Column(nullable = false)
+    private boolean isAvailable = true;
 
     @ManyToOne
     @JoinColumn(name = "owner_id")
     private User owner;
 
-    // 💡 Добавляем конструктор для создания Car из CarRequest
+    // 💡 Конструктор для создания Car из CarRequest
     public Car(CarRequest request) {
         this.brand = request.brand();
         this.model = request.model();
+        this.year = request.year();
+        this.color = request.color();
+        this.description = request.description();
         this.pricePerDay = request.pricePerDay();
     }
 
@@ -42,5 +69,13 @@ public class Car {
         this.brand = request.brand();
         this.model = request.model();
         this.pricePerDay = request.pricePerDay();
+    }
+
+    public String getTitle() {
+        return brand + " " + model;
+    }
+
+    public boolean isOwnedBy(User user) {
+        return this.owner.equals(user);
     }
 }

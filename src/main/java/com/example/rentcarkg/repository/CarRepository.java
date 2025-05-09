@@ -2,6 +2,8 @@ package com.example.rentcarkg.repository;
 
 import com.example.rentcarkg.model.Car;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
@@ -23,5 +25,8 @@ public interface CarRepository extends JpaRepository<Car, Long> {
     List<Car> findByBrandIgnoreCase(String brand);
 
     boolean existsById(Long id);
+
+    @Query("SELECT c FROM Car c WHERE c.id = :id AND c.isAvailable = true")
+    Optional<Car> findAvailableById(@Param("id") Long id);
 }
 
