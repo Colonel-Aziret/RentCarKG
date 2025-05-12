@@ -1,6 +1,8 @@
 package com.example.rentcarkg.service;
 
+import com.example.rentcarkg.exceptions.CustomTokenExpiredException;
 import com.example.rentcarkg.model.User;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,15 +15,18 @@ import java.util.Date;
 public class JwtProvider {
     @Value("${token.signing.key}")
     private String SECRET_KEY;
-    private static final long EXPIRATION_TIME = 864000000; // 24 часа
+    private static final long EXPIRATION_TIME = 86400000; // 24 часа
 
     public String generateToken(User user) {
         SecretKey key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
 
+        Date expirationDate = new Date(System.currentTimeMillis() + EXPIRATION_TIME);
+
         return Jwts.builder()
                 .setSubject(user.getEmail())
-                .claim("role", user.getRole().name()) // добавляем роль в токен
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .claim("role", user.getRole().name())
+                .setIssuedAt(new Date())
+                .setExpiration(expirationDate)
                 .signWith(key)
                 .compact();
     }
@@ -29,12 +34,17 @@ public class JwtProvider {
     public String getEmailFromToken(String token) {
         SecretKey key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
 
-        return Jwts.parser()
-                .verifyWith(key)
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
+        try {
+            return Jwts.parser()
+                    .verifyWith(key)
+                    .setAllowedClockSkewSeconds(60)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody()
+                    .getSubject();
+        } catch (ExpiredJwtException e) {
+            throw new CustomTokenExpiredException("JWT токен истек. Пожалуйста, получите новый токен.");
+        }
     }
 
     public String getRoleFromToken(String token) {
@@ -42,6 +52,7 @@ public class JwtProvider {
 
         return Jwts.parser()
                 .verifyWith(key)
+                .setAllowedClockSkewSeconds(60)
                 .build()
                 .parseClaimsJws(token)
                 .getBody()

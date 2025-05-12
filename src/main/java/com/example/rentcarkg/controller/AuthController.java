@@ -29,4 +29,24 @@ public class AuthController {
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
     }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<String> forgotPassword(@RequestParam String email) {
+        authService.sendResetPasswordToken(email);
+        return ResponseEntity.ok("Письмо для сброса пароля отправлено");
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(
+            @RequestParam String token,
+            @RequestParam String newPassword) {
+        authService.resetPassword(token, newPassword);
+        return ResponseEntity.ok("Пароль успешно сброшен");
+    }
+
+    @Operation(summary = "Обновление JWT токена")
+    @PostMapping("/refresh-token")
+    public ResponseEntity<AuthResponse> refreshToken(@RequestParam String refreshToken) {
+        return ResponseEntity.ok(authService.refreshToken(refreshToken));
+    }
 }

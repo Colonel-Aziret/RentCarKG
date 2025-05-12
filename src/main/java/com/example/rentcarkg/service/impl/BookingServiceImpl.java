@@ -100,6 +100,7 @@ public class BookingServiceImpl implements BookingService {
         }
 
         booking.setStatus(BookingStatus.EMAIL_CONFIRMED);
+        booking.setEmailConfirmedAt(LocalDateTime.now());
         bookingRepository.save(booking);
 
         return new BookingResponse(booking);
