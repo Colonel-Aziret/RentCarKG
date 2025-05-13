@@ -3,16 +3,27 @@ package com.example.rentcarkg.service.impl;
 import com.example.rentcarkg.dto.AuthResponse;
 import com.example.rentcarkg.dto.LoginRequest;
 import com.example.rentcarkg.dto.RegisterRequest;
+import com.example.rentcarkg.exceptions.CustomTokenExpiredException;
+import com.example.rentcarkg.exceptions.CustomTokenValidationException;
+import com.example.rentcarkg.model.PasswordResetToken;
 import com.example.rentcarkg.model.User;
+import com.example.rentcarkg.repository.PasswordResetTokenRepository;
 import com.example.rentcarkg.repository.UserRepository;
 import com.example.rentcarkg.service.AuthService;
 import com.example.rentcarkg.service.JwtProvider;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +32,8 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
+    private final JavaMailSender mailSender;
+    private final PasswordResetTokenRepository tokenRepository;
 
     @Override
     public AuthResponse register(RegisterRequest request) {
@@ -53,11 +66,74 @@ public class AuthServiceImpl implements AuthService {
         return generateAuthResponse(user);
     }
 
+    public AuthResponse refreshToken(String refreshToken) {
+        try {
+            String email = jwtProvider.getEmailFromToken(refreshToken);
+            User user = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+            return new AuthResponse(
+                    jwtProvider.generateToken(user),
+                    jwtProvider.generateRefreshToken(user),
+                    jwtProvider.getExpirationTime()
+            );
+        } catch (CustomTokenExpiredException | ExpiredJwtException e) {
+            throw new CustomTokenValidationException("Refresh token expired");
+        } catch (JwtException e) {
+            throw new CustomTokenValidationException("Invalid refresh token");
+        }
+    }
+
     private AuthResponse generateAuthResponse(User user) {
         String token = jwtProvider.generateToken(user);
         long expiresIn = jwtProvider.getExpirationTime();
 
-        return new AuthResponse(token, expiresIn);
+        String refreshToken = jwtProvider.generateRefreshToken(user);
+
+        return new AuthResponse(token, refreshToken, expiresIn);
     }
 
+    public void sendResetPasswordToken(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+
+        String token = UUID.randomUUID().toString();
+        PasswordResetToken resetToken = new PasswordResetToken(
+                null,
+                token,
+                user,
+                LocalDateTime.now().plusHours(1)
+        );
+
+        tokenRepository.save(resetToken);
+
+        String link = "http://localhost:3000/reset-password?token=" + token;
+        String body = "Для сброса пароля перейдите по ссылке: " + link;
+
+        sendEmail(email, body);
+    }
+
+    public void resetPassword(String token, String newPassword) {
+        PasswordResetToken resetToken = tokenRepository.findByToken(token)
+                .orElseThrow(() -> new RuntimeException("Неверный токен"));
+
+        if (resetToken.isExpired()) {
+            throw new RuntimeException("Токен истёк");
+        }
+
+        User user = resetToken.getUser();
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        tokenRepository.delete(resetToken);
+    }
+
+    private void sendEmail(String to, String body) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("noreply@rentcarkg.kg");
+        message.setTo(to);
+        message.setSubject("Сброс пароля");
+        message.setText(body);
+        mailSender.send(message);
+    }
 }

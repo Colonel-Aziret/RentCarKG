@@ -1,6 +1,8 @@
 package com.example.rentcarkg.service;
 
+import com.example.rentcarkg.exceptions.CustomTokenExpiredException;
 import com.example.rentcarkg.repository.UserRepository;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
 @Component
@@ -29,6 +32,7 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+
         if (request.getMethod().equalsIgnoreCase("OPTIONS")) {
             filterChain.doFilter(request, response);
             return;
@@ -37,22 +41,41 @@ public class JwtFilter extends OncePerRequestFilter {
         String token = resolveToken(request);
 
         if (token != null && jwtProvider.getEmailFromToken(token) != null) {
-            String email = jwtProvider.getEmailFromToken(token);
+            try {
+                String email = jwtProvider.getEmailFromToken(token);
 
-            UserDetails userDetails = userRepository.findByEmail(email)
-                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                UserDetails userDetails = userRepository.findByEmail(email)
+                        .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-            String role = jwtProvider.getRoleFromToken(token);
-            List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role));
+                String role = jwtProvider.getRoleFromToken(token);
+                List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role));
 
-            UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
 
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            log.info("Authenticated user: {} with roles: {}", email, userDetails.getAuthorities());
+                log.info("Authenticated user: {} with roles: {}", email, userDetails.getAuthorities());
+
+            } catch (CustomTokenExpiredException ex) {
+                log.warn("JWT token expired (Custom): {}", ex.getMessage());
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("Token expired");
+                return;
+            } catch (ExpiredJwtException ex) {
+                // Токен истёк - отправляем 401 UNAUTHORIZED
+                log.warn("JWT token expired: {}", ex.getMessage());
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("Token expired");
+                return;
+            } catch (Exception ex) {
+                // Другие ошибки JWT (невалидный токен и т.д.)
+                log.warn("Invalid JWT token: {}", ex.getMessage());
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("Invalid token");
+                return;
+            }
         }
-
         filterChain.doFilter(request, response);
     }
 
