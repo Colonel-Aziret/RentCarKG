@@ -3,12 +3,16 @@ package com.example.rentcarkg.service.impl;
 import com.example.rentcarkg.dto.AuthResponse;
 import com.example.rentcarkg.dto.LoginRequest;
 import com.example.rentcarkg.dto.RegisterRequest;
+import com.example.rentcarkg.exceptions.CustomTokenExpiredException;
+import com.example.rentcarkg.exceptions.CustomTokenValidationException;
 import com.example.rentcarkg.model.PasswordResetToken;
 import com.example.rentcarkg.model.User;
 import com.example.rentcarkg.repository.PasswordResetTokenRepository;
 import com.example.rentcarkg.repository.UserRepository;
 import com.example.rentcarkg.service.AuthService;
 import com.example.rentcarkg.service.JwtProvider;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.SimpleMailMessage;
@@ -63,17 +67,30 @@ public class AuthServiceImpl implements AuthService {
     }
 
     public AuthResponse refreshToken(String refreshToken) {
-        String email = jwtProvider.getEmailFromToken(refreshToken);
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        return generateAuthResponse(user); // Генерирует новый access token
+        try {
+            String email = jwtProvider.getEmailFromToken(refreshToken);
+            User user = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+            return new AuthResponse(
+                    jwtProvider.generateToken(user),
+                    jwtProvider.generateRefreshToken(user),
+                    jwtProvider.getExpirationTime()
+            );
+        } catch (CustomTokenExpiredException | ExpiredJwtException e) {
+            throw new CustomTokenValidationException("Refresh token expired");
+        } catch (JwtException e) {
+            throw new CustomTokenValidationException("Invalid refresh token");
+        }
     }
 
     private AuthResponse generateAuthResponse(User user) {
         String token = jwtProvider.generateToken(user);
         long expiresIn = jwtProvider.getExpirationTime();
 
-        return new AuthResponse(token, expiresIn);
+        String refreshToken = jwtProvider.generateRefreshToken(user);
+
+        return new AuthResponse(token, refreshToken, expiresIn);
     }
 
     public void sendResetPasswordToken(String email) {

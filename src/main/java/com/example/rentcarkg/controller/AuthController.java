@@ -2,6 +2,7 @@ package com.example.rentcarkg.controller;
 
 import com.example.rentcarkg.dto.AuthResponse;
 import com.example.rentcarkg.dto.LoginRequest;
+import com.example.rentcarkg.dto.RefreshTokenRequest;
 import com.example.rentcarkg.dto.RegisterRequest;
 import com.example.rentcarkg.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -44,9 +45,11 @@ public class AuthController {
         return ResponseEntity.ok("Пароль успешно сброшен");
     }
 
+//    @CrossOrigin(origins = "*", allowedHeaders = "*", exposedHeaders = "*",
+//            methods = {RequestMethod.GET, RequestMethod.OPTIONS})
     @Operation(summary = "Обновление JWT токена")
     @PostMapping("/refresh-token")
-    public ResponseEntity<AuthResponse> refreshToken(@RequestParam String refreshToken) {
-        return ResponseEntity.ok(authService.refreshToken(refreshToken));
+    public ResponseEntity<AuthResponse> refreshToken(@RequestBody RefreshTokenRequest request) {
+        return ResponseEntity.ok(authService.refreshToken(request.refreshToken()));
     }
 }
