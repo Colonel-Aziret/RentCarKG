@@ -60,4 +60,19 @@ public class EmailService {
 
         sendEmail(recipient, subject, htmlMessage, true);
     }
+
+    public void sendContactMessage(String fullName, String fromEmail, String messageContent) {
+        String to = "aziret5265@gmail.com"; // email, куда придёт сообщение
+        String subject = "New Contact Message from " + fullName;
+        String html = """
+        <html>
+        <body>
+            <h3>New message from %s (%s)</h3>
+            <p>%s</p>
+        </body>
+        </html>
+        """.formatted(fullName, fromEmail, messageContent);
+
+        sendEmail(to, subject, html, true);
+    }
 }
