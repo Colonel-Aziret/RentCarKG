@@ -1,8 +1,8 @@
 package com.example.rentcarkg.service.impl;
 
 import com.example.rentcarkg.dto.BookingCustomerInfoDto;
-import com.example.rentcarkg.dto.BookingRequest;
-import com.example.rentcarkg.dto.BookingResponse;
+import com.example.rentcarkg.dto.request.BookingRequest;
+import com.example.rentcarkg.dto.response.BookingResponse;
 import com.example.rentcarkg.enums.BookingStatus;
 import com.example.rentcarkg.model.*;
 import com.example.rentcarkg.repository.BookingRepository;

@@ -1,8 +1,8 @@
 package com.example.rentcarkg.service;
 
-import com.example.rentcarkg.dto.AuthResponse;
-import com.example.rentcarkg.dto.LoginRequest;
-import com.example.rentcarkg.dto.RegisterRequest;
+import com.example.rentcarkg.dto.response.AuthResponse;
+import com.example.rentcarkg.dto.request.LoginRequest;
+import com.example.rentcarkg.dto.request.RegisterRequest;
 
 public interface AuthService {
     AuthResponse register(RegisterRequest registerRequest);

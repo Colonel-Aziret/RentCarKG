@@ -1,6 +1,6 @@
 package com.example.rentcarkg.model;
 
-import com.example.rentcarkg.dto.CarRequest;
+import com.example.rentcarkg.dto.request.CarRequest;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;

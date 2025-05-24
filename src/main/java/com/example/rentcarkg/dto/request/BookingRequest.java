@@ -1,5 +1,6 @@
-package com.example.rentcarkg.dto;
+package com.example.rentcarkg.dto.request;
 
+import com.example.rentcarkg.dto.BookingCustomerInfoDto;
 import jakarta.validation.constraints.*;
 
 import java.time.LocalDate;

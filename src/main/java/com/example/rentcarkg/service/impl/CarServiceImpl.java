@@ -1,7 +1,7 @@
 package com.example.rentcarkg.service.impl;
 
-import com.example.rentcarkg.dto.CarRequest;
-import com.example.rentcarkg.dto.CarResponse;
+import com.example.rentcarkg.dto.request.CarRequest;
+import com.example.rentcarkg.dto.response.CarResponse;
 import com.example.rentcarkg.enums.BookingStatus;
 import com.example.rentcarkg.model.Car;
 import com.example.rentcarkg.model.User;

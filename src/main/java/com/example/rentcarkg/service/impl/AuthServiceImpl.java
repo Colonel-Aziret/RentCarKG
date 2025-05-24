@@ -1,8 +1,8 @@
 package com.example.rentcarkg.service.impl;
 
-import com.example.rentcarkg.dto.AuthResponse;
-import com.example.rentcarkg.dto.LoginRequest;
-import com.example.rentcarkg.dto.RegisterRequest;
+import com.example.rentcarkg.dto.response.AuthResponse;
+import com.example.rentcarkg.dto.request.LoginRequest;
+import com.example.rentcarkg.dto.request.RegisterRequest;
 import com.example.rentcarkg.exceptions.CustomTokenExpiredException;
 import com.example.rentcarkg.exceptions.CustomTokenValidationException;
 import com.example.rentcarkg.model.PasswordResetToken;

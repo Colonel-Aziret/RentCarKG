@@ -1,4 +1,4 @@
-package com.example.rentcarkg.dto;
+package com.example.rentcarkg.dto.response;
 
 import com.example.rentcarkg.enums.BookingStatus;
 import com.example.rentcarkg.model.Booking;
