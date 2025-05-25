@@ -44,6 +44,9 @@ public class SecurityConfig {
                         // Открываем доступ к статическим файлам
                         .requestMatchers("/static/images/**").permitAll()
 
+                        // 🔓 Открываем доступ к главной странице
+                        .requestMatchers("/").permitAll()
+
                         // 🔓 Открываем доступ к регистрации и авторизации
                         .requestMatchers("/api/auth/register", "/api/auth/login", "/api/auth/forgot-password", "/api/auth/reset-password", "/api/auth/refresh-token").permitAll()
 
