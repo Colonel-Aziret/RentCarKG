@@ -45,13 +45,13 @@ public class SecurityConfig {
                         .requestMatchers("/static/images/**").permitAll()
 
                         // 🔓 Открываем доступ к регистрации и авторизации
-                        .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
+                        .requestMatchers("/api/auth/register", "/api/auth/login", "/api/auth/forgot-password", "/api/auth/reset-password", "/api/auth/refresh-token").permitAll()
 
                         // 🔓 Открываем доступ к Swagger
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
 
                         // 🔓 Открытый доступ к email-сервису (без авторизации)
-                        .requestMatchers(HttpMethod.POST, "/api/email/send").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/email/send", "/api/email/contact").permitAll()
 
                         // 🔓 Открытый доступ ко всем GET-запросам на /api/cars/**
                         .requestMatchers(HttpMethod.GET, "/api/cars/**").permitAll()

@@ -1,7 +1,7 @@
 package com.example.rentcarkg.controller;
 
-import com.example.rentcarkg.dto.BookingRequest;
-import com.example.rentcarkg.dto.BookingResponse;
+import com.example.rentcarkg.dto.request.BookingRequest;
+import com.example.rentcarkg.dto.response.BookingResponse;
 import com.example.rentcarkg.service.BookingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

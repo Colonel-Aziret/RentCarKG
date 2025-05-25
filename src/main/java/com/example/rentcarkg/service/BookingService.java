@@ -1,7 +1,7 @@
 package com.example.rentcarkg.service;
 
-import com.example.rentcarkg.dto.BookingRequest;
-import com.example.rentcarkg.dto.BookingResponse;
+import com.example.rentcarkg.dto.request.BookingRequest;
+import com.example.rentcarkg.dto.response.BookingResponse;
 
 import java.time.LocalDate;
 import java.util.List;

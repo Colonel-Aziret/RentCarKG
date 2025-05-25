@@ -1,7 +1,7 @@
 package com.example.rentcarkg.service;
 
-import com.example.rentcarkg.dto.CarRequest;
-import com.example.rentcarkg.dto.CarResponse;
+import com.example.rentcarkg.dto.request.CarRequest;
+import com.example.rentcarkg.dto.response.CarResponse;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;

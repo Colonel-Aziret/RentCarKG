@@ -52,6 +52,9 @@ public class Booking {
 
     private LocalDateTime createdAt;
 
+    @Column(name = "email_confirmed_at")
+    private LocalDateTime emailConfirmedAt;
+
     @OneToOne(mappedBy = "booking", cascade = CascadeType.ALL)
     private BookingCustomerDetails customerDetails;
 

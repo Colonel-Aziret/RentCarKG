@@ -1,4 +1,4 @@
-package com.example.rentcarkg.dto;
+package com.example.rentcarkg.dto.request;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
