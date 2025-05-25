@@ -17,7 +17,7 @@ public class WebConfig {
             @Override
             public void addCorsMappings(@NonNull CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:3000")
+                        .allowedOrigins("https://rentcarkg.netlify.app")
                         .allowedMethods("*")
                         .allowedHeaders("*")
                         .allowCredentials(true);
