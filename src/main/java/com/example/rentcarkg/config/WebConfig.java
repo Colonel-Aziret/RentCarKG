@@ -15,15 +15,6 @@ public class WebConfig {
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
             @Override
-            public void addCorsMappings(@NonNull CorsRegistry registry) {
-                registry.addMapping("/**")
-                        .allowedOrigins("https://rentcarkg.netlify.app")
-                        .allowedMethods("*")
-                        .allowedHeaders("*")
-                        .allowCredentials(true);
-            }
-
-            @Override
             public void addResourceHandlers(@NonNull ResourceHandlerRegistry registry) {
                 // Путь для отдачи изображений
                 String uploadsDir = Paths.get("uploads").toAbsolutePath().toString();
