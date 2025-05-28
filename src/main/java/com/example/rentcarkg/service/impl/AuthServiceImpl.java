@@ -75,6 +75,8 @@ public class AuthServiceImpl implements AuthService {
             return new AuthResponse(
                     jwtProvider.generateToken(user),
                     jwtProvider.generateRefreshToken(user),
+                    user.getRole().name(),
+                    user.getEmail(),
                     jwtProvider.getExpirationTime()
             );
         } catch (CustomTokenExpiredException | ExpiredJwtException e) {
@@ -90,7 +92,13 @@ public class AuthServiceImpl implements AuthService {
 
         String refreshToken = jwtProvider.generateRefreshToken(user);
 
-        return new AuthResponse(token, refreshToken, expiresIn);
+        return new AuthResponse(
+                token,
+                refreshToken,
+                user.getRole().name(),
+                user.getEmail(),
+                expiresIn
+        );
     }
 
     public void sendResetPasswordToken(String email) {

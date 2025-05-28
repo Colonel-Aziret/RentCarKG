@@ -38,6 +38,16 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
+        String path = request.getServletPath();
+
+        if (request.getMethod().equalsIgnoreCase("OPTIONS") ||
+                path.equals("/api/auth/refresh-token") ||
+                path.equals("/api/auth/login") ||
+                path.equals("/api/auth/register")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String token = resolveToken(request);
 
         if (token != null && jwtProvider.getEmailFromToken(token) != null) {
