@@ -1,0 +1,41 @@
+[Unit]
+Description=RentCarKG Backend Application
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root
+
+# Environment variables
+Environment=SPRING_PROFILES_ACTIVE=prod
+Environment=JWT_SECRET_KEY=VlKr3mmdUr2r2zHjOP7lvseZ+aS9fdPTz3ne0nhjto/0goZEZhIG//QD8d1/tqbsuMvsdKroJFd7DL+Wc151Tg==
+Environment=DB_USERNAME=postgres
+Environment=DB_PASSWORD=12345
+Environment=DATABASE_URL=jdbc:postgresql://localhost:5432/rentcarkg
+Environment=MAIL_HOST=sandbox.smtp.mailtrap.io
+Environment=MAIL_PORT=587
+Environment=MAIL_USERNAME=39f8c47070f5f7
+Environment=MAIL_PASSWORD=3ba27f7d7417eb
+Environment=PORT=8080
+
+# Java options for better performance
+Environment=JAVA_OPTS=-Xmx512m -Xms256m -XX:+UseG1GC
+
+ExecStart=/usr/bin/java $JAVA_OPTS -jar /root/rentcarkg-0.0.1-SNAPSHOT.jar
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+# Security improvements
+NoNewPrivileges=true
+ProtectSystem=strict
+PrivateTmp=true
+
+# Healthcheck (optional)
+TimeoutStartSec=300
+TimeoutStopSec=30
+
+[Install]
+WantedBy=multi-user.target
