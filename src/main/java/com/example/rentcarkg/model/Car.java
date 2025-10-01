@@ -61,8 +61,12 @@ public class Car {
         this.model = request.model();
         this.year = request.year();
         this.color = request.color();
-        this.description = request.description();
+        this.capacity = request.capacity();
+        this.fuelType = request.fuelType();
+        this.transmission = request.transmission();
         this.pricePerDay = request.pricePerDay();
+        this.description = request.description();
+        this.isAvailable = true;
     }
 
     public void updateFromRequest(CarRequest request) {
